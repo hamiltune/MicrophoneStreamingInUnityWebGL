@@ -23,3 +23,7 @@ The microphone data is processed with an AudioWorklet node and chunks of a fixed
 2. Either check the "Create Source" checkbox in the editor on the WebGLMicStream Component or Add a WebGLAudioSource Component to an object.
 3. Place the WebGLAudioListener component the object who is "listening" i.e. (Camera)
 4. Play with settings (test with latency and buffer sizes)
+
+# Important Notes!!
+
+As of the current version, please put "worker.js" in the base directory where index.html resides.
