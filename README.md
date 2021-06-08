@@ -11,27 +11,27 @@ The high-level goal of this plugin is to use a JavaScript audio context to handl
 There are three primary scripts to use in the Unity editor, the WebGL microphone streaming script, the WebGL audio source script and the WebGL audio listener script. Here is a meh diagram demonstrating how it works:
 
 
-  Browser Environment    |    Unity Environment
-  
+  Browser Environment    |    Unity Environment
+
 -------------------------+------------------------------
 
-+----------------+   float[]  +--------------------+
++----------------+   float[]  +--------------------+
 
 | WebGLMicStream | ---------> | WebGL Audio Source |
 
-+----------------+            +--------------------+
++----------------+            +--------------------+
 
-                                        |
+                                        |
                                         
-                                        |
+                                        |
                                         
-                                        v
+                                        v
                                         
 +--------------------+ float[] +----------------------+
 
 | WebGLAudioListener | <------ | WebGL Audio Listener |
 
-+--------------------+         +----------------------+
++--------------------+         +----------------------+
 
 
 
