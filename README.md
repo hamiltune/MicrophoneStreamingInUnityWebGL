@@ -10,17 +10,30 @@ The high-level goal of this plugin is to use a JavaScript audio context to handl
 
 There are three primary scripts to use in the Unity editor, the WebGL microphone streaming script, the WebGL audio source script and the WebGL audio listener script. Here is a meh diagram demonstrating how it works:
 
+
   Browser Environment    |    Unity Environment
+  
 -------------------------+------------------------------
+
 +----------------+   float[]  +--------------------+
+
 | WebGLMicStream | ---------> | WebGL Audio Source |
+
 +----------------+            +--------------------+
+
                                         |
+                                        
                                         |
+                                        
                                         v
+                                        
 +--------------------+ float[] +----------------------+
+
 | WebGLAudioListener | <------ | WebGL Audio Listener |
+
 +--------------------+         +----------------------+
+
+
 
 The microphone data is processed with an AudioWorklet node and chunks of a fixed buffer size are sent into Unity. The general strategy is to Enqueue/Dequeue buffers while keeping in mind latency (framerate). The "destination" is a JavaScript AudioContext that creates AudioBuffers of fixed sizes and schedules them. 
 
