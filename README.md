@@ -15,11 +15,11 @@ There are three primary scripts to use in the Unity editor, the WebGL microphone
 
 -------------------------+------------------------------
 
-+----------------+   float[]  +--------------------+
++--------------------+   float[]  +------------------------+
 
 | WebGLMicStream | ---------> | WebGL Audio Source |
 
-+----------------+            +--------------------+
++--------------------+            +------------------------+
 
                                         |
                                         
@@ -27,11 +27,11 @@ There are three primary scripts to use in the Unity editor, the WebGL microphone
                                         
                                         v
                                         
-+--------------------+ float[] +----------------------+
++------------------------+ float[] +--------------------------+
 
 | WebGLAudioListener | <------ | WebGL Audio Listener |
 
-+--------------------+         +----------------------+
++------------------------+         +--------------------------+
 
 
 
