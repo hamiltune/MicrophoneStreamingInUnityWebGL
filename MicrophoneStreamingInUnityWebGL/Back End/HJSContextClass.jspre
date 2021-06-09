@@ -39,33 +39,40 @@ var HJSContext = class {
 
         active = true;
 
-        // Main loop
+                // Main loop
         const mainLoop = async function () {
             console.log("Started Main HJS Loop");
             // TODO: Adjust the initial wait and buffer size. Lose dynamics though..
             nextStartTime = ctx.currentTime + 0.1;
-            let audioBuffer;
-            let source;
-            self.latency = 0.3;
+            // let audioBuffer;
+            // let source;
+            // let panner;
+            // let data;
+            // self.latency = 40;
             self.latencySecs = (self.latency / 1000);
 
             while (active) {
-                audioBuffer = ctx.createBuffer(1, bufferSize, sampleRate);
-                while (bufferQueue.length == 0) {
-                    nextStartTime += self.latencySecs;
-                    await self.forTime(self.latency - 0.08);
+                if (bufferQueue.length == 0) {
+                    while (active && bufferQueue.length == 0) {
+                        await self.forTime(self.latency);
+                    }
+                    nextStartTime = ctx.currentTime + self.latencySecs;
                 }
-                if (ctx.currentTime > nextStartTime) nextStartTime = ctx.currentTime + self.latency;
-                let f32 = bufferQueue.shift();
-                audioBuffer.getChannelData(0).set(f32);
-                source = ctx.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(ctx.destination);
-                if(nextStartTime == 0) nextStartTime = ctx.currentTime + waitTime;
-                source.start(nextStartTime);
-                nextStartTime += bufferTime;
-                // console.log(bufferQueue.length);
-                await self.until(_=> ctx.currentTime > nextStartTime - self.latency);
+                while (active && bufferQueue.length > 0) {
+                    let audioBuffer = ctx.createBuffer(1, bufferSize, sampleRate);
+                    let data = bufferQueue.shift();
+                    audioBuffer.getChannelData(0).set(data.buffer);
+                    let source = ctx.createBufferSource();
+                    let panner = ctx.createStereoPanner();
+                    source.buffer = audioBuffer;
+                    panner.pan.value = data.pan;
+                    source.connect(panner);
+                    panner.connect(ctx.destination);
+                    if(nextStartTime == 0) nextStartTime = ctx.currentTime + bufferTime;
+                    source.start(nextStartTime);
+                    nextStartTime += bufferTime;
+                }
+                await self.forTime(10);
             }
         };
 
@@ -74,9 +81,11 @@ var HJSContext = class {
 
     Enqueue(buffer) {
         let num = this.bufferSize / buffer.length;
+        let pan = 0.5;
         // console.log("hsj: enqueueing " + buffer[0]);
         for (let i = 0; i < num; i++) {
-            this.bufferQueue.push(buffer.subarray(i * buffer.length, (i + 1) * buffer.length));
+            let wrapper = new DataWrapper(buffer.subarray(i * buffer.length, (i + 1) * buffer.length), pan);
+            this.bufferQueue.push(wrapper);
         }        
     }
 }
@@ -88,3 +97,10 @@ var ListenerWrapper = class {
         this.bufferSize = bufferSize;
     }
 }
+
+var DataWrapper = class {
+    constructor(buffer, pan) {
+        this.buffer = buffer;
+        this.pan = pan;
+    }
+};

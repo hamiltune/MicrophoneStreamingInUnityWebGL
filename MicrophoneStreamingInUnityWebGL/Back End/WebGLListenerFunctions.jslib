@@ -3,7 +3,6 @@ mergeInto(LibraryManager.library, {
     InitializeWebGLListener: function (bufferSize, sampleRate, latency, id) {
         if (window.WebGLAudioSources == undefined) {
             window.WebGLAudioSources = [];
-            window.sourceId = 0;
         }
 
         hctx = new HJSContext(bufferSize, sampleRate, latency);

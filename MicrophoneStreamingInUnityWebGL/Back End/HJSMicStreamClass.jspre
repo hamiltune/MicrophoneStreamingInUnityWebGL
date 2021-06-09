@@ -21,7 +21,8 @@ var HJSMicStream = class {
         var ctx = new AudioContext({sampleRate: sampleRate});
         this.ctx = ctx;
         var strm = ctx.createMediaStreamSource(stream);
-        await ctx.audioWorklet.addModule('worklet.js');
+        // await ctx.audioWorklet.addModule('Build/WebGL.framework.js');
+        await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([createProcessor], {type: "application/javascript"})));
         var scriptNode = new AudioWorkletNode(ctx, 'worklet-processor');
         scriptNode.port.postMessage({buffer_size:bufferSize});
         strm.connect(scriptNode);
