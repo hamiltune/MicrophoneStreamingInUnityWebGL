@@ -119,9 +119,8 @@ public class WebGLAudioSource : MonoBehaviour
     }
 
     protected virtual void PushWebGL(float[] data) {
-        Debug.Log(WebGLAudio.WebGLAudio.listeners.Count);
         foreach (WebGLAudioListener listener in WebGLAudio.WebGLAudio.listeners) {
-            listener.PushToDestination(data, transform.position, spatialBlend);
+            listener.PushToDestination(data, transform.position, sourceId, spatialBlend);
         }
     }
 

@@ -21,9 +21,9 @@ public class WebGLAudioListener : MonoBehaviour
 
     #if UNITY_WEBGL && !UNITY_EDITOR
         [DllImport("__Internal")]
-        private static extern int InitializeWebGLListener(int size, int rate, int latency, int id);
+        private static extern int InitializeWebGLListener(int size, int rate, int latency);
         [DllImport("__Internal")]
-        private static extern bool PushToAudioListener(float[] buffer, float pan, int id);
+        private static extern bool PushToAudioListener(float[] buffer, float px, float py, float pz, float rx, float ry, float rz, int id);
         [DllImport("__Internal")]
         private static extern bool MuteAudioListener(int id);
     #endif
@@ -34,34 +34,30 @@ public class WebGLAudioListener : MonoBehaviour
         WebGLAudio.WebGLAudio.listeners.Add(this);
         
         #if UNITY_WEBGL && !UNITY_EDITOR
-            InitializeWebGLListener(bufferSize, sampleRate, latencyInMS, listenerId);
+            InitializeWebGLListener(bufferSize, sampleRate, latencyInMS);
         #else
             muted = true;
         #endif
     }
 
-    public void PushToDestination(float[] data, Vector3 src, float spatialBlend) {
+    public void PushToDestination(float[] data, Vector3 src, int srcId, float spatialBlend) {
         #if UNITY_WEBGL && !UNITY_EDITOR
 
             if (muted) return;
 
-            float pan = 0.0f;
+            Vector3 relPos = src - transform.position;
+            Vector3 rot = transform.forward;
 
-            // float pan, dist, vol, tmp, rot, otherBlend, x;
+            // float pan = 0.0f;
 
-            // otherBlend = 1 - spatialBlend;
+            // float dist, vol, tmp, angle, otherBlend;
+
+            // otherBlend = 1f - spatialBlend;
             // spatialBlend *= volume;
             // otherBlend *= volume;
 
-            // Quaternion t = transform.rotation;
-            // transform.LookAt(src, Vector3.up);
-            // rot = Quaternion.Angle(t, transform.rotation);
-            // transform.rotation = t;
-
-            // Vector3 side = Vector3.Cross(Vector3.up, new Vector3(0, rot, 0)).normalized;
-            // x = Vector3.Dot(src - transform.position, side);
-
-            // pan = Mathf.Clamp(x / 30f, -1, 1);
+            // angle = Vector3.Angle(transform.forward, src - transform.position);
+            // pan = Mathf.Sin(angle);           
             
             // dist = (src - transform.position).magnitude;
             // vol = 1f / dist;
@@ -71,7 +67,7 @@ public class WebGLAudioListener : MonoBehaviour
             //     data[i] = spatialBlend * tmp * vol + otherBlend * tmp;
             // }
 
-            PushToAudioListener(data, pan, listenerId);
+            PushToAudioListener(data, relPos.x, relPos.y, relPos.z, rot.x, rot.y, rot.z, srcId);
 
         #endif
     }

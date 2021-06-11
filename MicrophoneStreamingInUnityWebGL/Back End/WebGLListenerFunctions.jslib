@@ -1,25 +1,25 @@
 mergeInto(LibraryManager.library, {
 
-    InitializeWebGLListener: function (bufferSize, sampleRate, latency, id) {
-        if (window.WebGLAudioSources == undefined) {
-            window.WebGLAudioSources = [];
-        }
+    InitializeWebGLListener: function (bufferSize, sampleRate, latency) {
+        listener = new WebGLListener(bufferSize, sampleRate, latency);
+        listener.WebGLAudioSources = [];
+        window.WebGLListener = listener;
+        listener.CreateWebGLSource = function (id) {
+            hctx = new HJSContext(window.WebGLListener.bufferSize, window.WebGLListener.sampleRate, window.WebGLListener.latency);
+            hctx.start();
+            wrapper = new SourceWrapper(id, hctx, window.WebGLListener.bufferSize);
+            window.WebGLListener.WebGLAudioSources.push(wrapper);
+            console.log("Added new audio source: " + id);
+            return wrapper;
+        };
+    }, 
 
-        hctx = new HJSContext(bufferSize, sampleRate, latency);
-        hctx.start();
-        wrapper = new ListenerWrapper(id, hctx, bufferSize);
-        window.WebGLAudioSources.push(wrapper);
-        console.log("Added new audio source: " + id);
-    },
-
-    PushToAudioListener: function (buffer, pan, id) {
-        if (window.WebGLAudioSources == undefined) return;
+    PushToAudioListener: function (buffer, px, py, pz, rx, ry, rz, id) {
         src = undefined;
-        window.WebGLAudioSources.forEach(function(listener) { if (listener.id == id) src = listener; });
-        // console.log(id + " ("+src+"): " + unityBuffer[0]);
-        if (src == undefined) return;
+        window.WebGLListener.WebGLAudioSources.forEach(function(source) { if (source.id == id) src = source; });
+        if (src == undefined) src = window.WebGLListener.CreateWebGLSource(id);
         unityBuffer = new Float32Array(HEAPF32.buffer, buffer, src.bufferSize);
-        src.listener.Enqueue(unityBuffer);
+        src.source.Enqueue(unityBuffer, new Vector3(px, py, pz), new Vector3(rx, ry, rz));
     },
 
     MuteAudioListener: function(id) {
